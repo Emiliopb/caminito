@@ -1,4 +1,6 @@
 /Treated_csv/
 /raw_csv_per_year/
+clusteval_mm_oh
+models/clusteval_mm_oh
 *.xlsx
 *.csv
