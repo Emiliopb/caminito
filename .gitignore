@@ -1,1 +1,4 @@
-
+/Treated_csv/
+/raw_csv_per_year/
+*.xlsx
+*.csv
