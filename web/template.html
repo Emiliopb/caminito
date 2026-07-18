@@ -1,0 +1,723 @@
+<title>Stellae.ai — Flujos de peregrinos del Camino de Santiago</title>
+<meta name="description" content="Consultoría de flujos del Camino de Santiago: encontramos palancas concretas de crecimiento y revenue para tu negocio.">
+<style>
+  :root{
+    color-scheme: dark;
+
+    /* Neutros (azul-noche, elegidos con sesgo índigo) */
+    --ground:      #0A0E17;
+    --ground-2:    #0D1220;
+    --panel:       rgba(255,255,255,.045);
+    --panel-brd:   rgba(255,255,255,.09);
+    --panel-brd-2: rgba(255,255,255,.14);
+
+    /* Tinta */
+    --ink:      #EAECF2;
+    --ink-soft: #B7BECD;
+    --ink-mute: #838B9C;
+
+    /* Acento: la flecha amarilla del Camino */
+    --arrow:    #F5CE4B;
+    --arrow-dim:#B99A2E;
+
+    /* Perfiles de peregrino */
+    --p-a: #46C7B8;
+    --p-b: #E8A13A;
+    --p-c: #D96BA0;
+
+    /* Tipografía */
+    --font-display: 'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
+    --font-body: system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --font-mono: 'SF Mono','JetBrains Mono',ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;
+
+    /* Escala tipográfica */
+    --t--1: .812rem;
+    --t-0:  1rem;
+    --t-1:  1.25rem;
+    --t-2:  1.6rem;
+    --t-3:  2.1rem;
+    --t-4:  clamp(2.4rem, 5.5vw, 4rem);
+    --t-5:  clamp(3rem, 8vw, 6rem);
+
+    /* Espaciado */
+    --sp-1: .5rem; --sp-2: 1rem; --sp-3: 1.5rem; --sp-4: 2.5rem;
+    --sp-5: 4rem;  --sp-6: 6rem;
+
+    --maxw: 1120px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--t-0);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1,h2,h3{ font-family: var(--font-display); font-weight: 600; line-height: 1.08;
+            text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+  p{ margin: 0; }
+  a{ color: inherit; }
+
+  .eyebrow{
+    font-family: var(--font-body);
+    font-size: var(--t--1);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--arrow);
+    font-weight: 600;
+  }
+  .lede{ color: var(--ink-soft); font-size: var(--t-1); max-width: 34ch; }
+
+  .wrap{ max-width: var(--maxw); margin-inline: auto; padding-inline: var(--sp-3); }
+
+  /* ---------- HERO / MAPA ---------- */
+  .stage{
+    position: relative;
+    height: 100svh;
+    min-height: 620px;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 80% at 78% 8%, #131b30 0%, rgba(19,27,48,0) 55%),
+      var(--ground);
+  }
+  #map{ position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* Scrims para legibilidad del texto sobre el mapa */
+  .stage::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:
+      linear-gradient(to bottom, rgba(10,14,23,.72) 0%, rgba(10,14,23,0) 32%),
+      linear-gradient(to top, rgba(10,14,23,.92) 0%, rgba(10,14,23,.15) 34%, rgba(10,14,23,0) 55%),
+      linear-gradient(to left, rgba(10,14,23,.62) 0%, rgba(10,14,23,0) 48%);
+    z-index: 1;
+  }
+
+  .topbar{
+    position: absolute; z-index: 3; inset: 0 0 auto 0;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-3);
+  }
+  .brand{ display: flex; align-items: center; gap: .65rem; }
+  .brand svg{ width: 26px; height: 26px; flex: none; }
+  .brand .name{ font-family: var(--font-display); font-size: 1.18rem; font-weight: 600;
+                letter-spacing: .01em; }
+  .brand .name b{ color: var(--arrow); font-weight: 600; }
+  .topbar .tag{ font-size: var(--t--1); color: var(--ink-mute); letter-spacing: .04em; }
+
+  .hero-copy{
+    position: absolute; z-index: 3; left: 0; right: 0; top: 21%;
+    padding-inline: var(--sp-3);
+  }
+  .hero-copy .inner{ max-width: var(--maxw); margin-inline: auto;
+                     display: flex; justify-content: flex-end; }
+  .hero-text{ max-width: 30rem; }
+  .hero-copy h1{ font-size: var(--t-4); }
+  .hero-copy .lede{ margin-top: var(--sp-3); }
+
+  /* Panel de control inferior */
+  .console{
+    position: absolute; z-index: 3; left: 0; right: 0; bottom: 0;
+    padding: 0 var(--sp-3) var(--sp-3);
+  }
+  .console .inner{
+    max-width: var(--maxw); margin-inline: auto;
+    display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3);
+    align-items: end;
+  }
+  .kpis{ display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: flex-end; }
+  .kpi{
+    background: var(--panel); border: 1px solid var(--panel-brd);
+    border-radius: 12px; padding: .7rem 1rem; backdrop-filter: blur(8px);
+    min-width: 132px;
+  }
+  .kpi .k-label{ font-size: var(--t--1); color: var(--ink-mute); letter-spacing: .04em; }
+  .kpi .k-val{ font-family: var(--font-mono); font-size: 1.5rem; font-variant-numeric: tabular-nums;
+               margin-top: .15rem; color: var(--ink); }
+  .kpi .k-val small{ font-size: .9rem; color: var(--ink-soft); font-family: var(--font-body); }
+
+  .transport{
+    background: var(--panel); border: 1px solid var(--panel-brd);
+    border-radius: 14px; padding: var(--sp-2) var(--sp-3);
+    backdrop-filter: blur(8px);
+    display: flex; flex-direction: column; gap: .7rem; min-width: 320px;
+  }
+  .transport .row{ display: flex; align-items: center; gap: var(--sp-2); }
+  .daylabel{ font-family: var(--font-mono); font-size: 1.05rem; color: var(--arrow);
+             font-variant-numeric: tabular-nums; letter-spacing: .02em; min-width: 108px; }
+  .play{
+    appearance: none; border: 1px solid var(--panel-brd-2); background: rgba(255,255,255,.06);
+    color: var(--ink); width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+    display: grid; place-items: center; flex: none; transition: background .15s, border-color .15s;
+  }
+  .play:hover{ background: rgba(245,206,75,.16); border-color: var(--arrow-dim); }
+  .play svg{ width: 15px; height: 15px; }
+
+  input[type=range]{
+    -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
+    background: linear-gradient(to right, var(--arrow) 0%, var(--arrow) var(--seek,0%), rgba(255,255,255,.16) var(--seek,0%));
+    border-radius: 999px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
+    background: var(--arrow); border: 2px solid var(--ground);
+    box-shadow: 0 0 0 1px var(--arrow-dim), 0 0 12px rgba(245,206,75,.6); cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width: 15px; height: 15px; border-radius: 50%; background: var(--arrow);
+    border: 2px solid var(--ground); box-shadow: 0 0 10px rgba(245,206,75,.6); cursor: pointer;
+  }
+
+  .filters{ display: flex; gap: .4rem; flex-wrap: wrap; }
+  .chip{
+    appearance: none; cursor: pointer; font-family: var(--font-body);
+    font-size: var(--t--1); color: var(--ink-soft);
+    background: rgba(255,255,255,.04); border: 1px solid var(--panel-brd);
+    border-radius: 999px; padding: .34rem .7rem; letter-spacing: .02em;
+    display: inline-flex; align-items: center; gap: .4rem; transition: all .15s;
+  }
+  .chip .dot{ width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .chip[data-on="1"]{ color: var(--ink); background: rgba(255,255,255,.09); border-color: var(--panel-brd-2); }
+  .chip:hover{ border-color: var(--panel-brd-2); }
+  .chip.pa{ --c: var(--p-a); } .chip.pb{ --c: var(--p-b); } .chip.pc{ --c: var(--p-c); }
+  .chip.pa .dot,.chip.pb .dot,.chip.pc .dot{ background: var(--c); box-shadow: 0 0 8px var(--c); }
+
+  /* Tooltip del mapa */
+  #tip{
+    position: absolute; z-index: 4; pointer-events: none; opacity: 0;
+    transform: translate(-50%, -140%); transition: opacity .12s;
+    background: rgba(13,18,32,.92); border: 1px solid var(--panel-brd-2);
+    border-radius: 9px; padding: .45rem .65rem; font-size: var(--t--1);
+    white-space: nowrap; backdrop-filter: blur(6px);
+  }
+  #tip .t-name{ color: var(--ink); font-weight: 600; }
+  #tip .t-num{ font-family: var(--font-mono); color: var(--arrow); }
+
+  .scrollcue{
+    position:absolute; z-index:3; left:50%; bottom: 12px; transform: translateX(-50%);
+    color: var(--ink-mute); font-size: var(--t--1); letter-spacing: .1em; text-transform: uppercase;
+    display: none;
+  }
+
+  /* ---------- SECCIONES ---------- */
+  .section{ padding-block: var(--sp-6); }
+  .section--lever{
+    background:
+      radial-gradient(90% 60% at 15% 0%, #12192b 0%, rgba(18,25,43,0) 60%),
+      var(--ground);
+    border-top: 1px solid var(--panel-brd);
+  }
+  .lever-head{ max-width: 40ch; }
+  .lever-head h2{ font-size: var(--t-4); margin-top: var(--sp-2); }
+  .lever-head .zone{ color: var(--arrow); }
+
+  .figures{
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3);
+    margin-top: var(--sp-5);
+  }
+  .figure{ border-top: 2px solid var(--panel-brd-2); padding-top: var(--sp-2); }
+  .figure .fig-num{
+    font-family: var(--font-mono); font-size: var(--t-5); line-height: 1;
+    font-variant-numeric: tabular-nums; color: var(--ink); letter-spacing: -.02em;
+  }
+  .figure .fig-num .unit{ font-size: .38em; color: var(--arrow); margin-left: .1em; letter-spacing: 0; }
+  .figure .fig-cap{ color: var(--ink-mute); font-size: var(--t--1); margin-top: .6rem;
+                    letter-spacing: .03em; max-width: 24ch; }
+
+  .lever-body{ margin-top: var(--sp-5); max-width: 62ch; color: var(--ink-soft);
+               font-size: var(--t-1); }
+  .lever-body strong{ color: var(--ink); font-weight: 600; }
+
+  .levers{
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3);
+    margin-top: var(--sp-5);
+  }
+  .card{
+    background: var(--panel); border: 1px solid var(--panel-brd);
+    border-radius: 16px; padding: var(--sp-3);
+    display: flex; flex-direction: column; gap: .7rem;
+  }
+  .card .kick{ font-size: var(--t--1); letter-spacing: .14em; text-transform: uppercase;
+               color: var(--arrow); font-weight: 600; }
+  .card h3{ font-size: var(--t-2); }
+  .card p{ color: var(--ink-soft); font-size: .98rem; }
+
+  /* ---------- CTA ---------- */
+  .section--cta{ border-top: 1px solid var(--panel-brd); text-align: left; }
+  .cta-inner{ max-width: 30ch; }
+  .section--cta h2{ font-size: var(--t-4); }
+  .section--cta p{ color: var(--ink-soft); font-size: var(--t-1); margin-top: var(--sp-3); }
+  .btn{
+    display: inline-flex; align-items: center; gap: .6rem; margin-top: var(--sp-4);
+    background: var(--arrow); color: #1a1400; font-weight: 650;
+    font-family: var(--font-body); font-size: 1.05rem;
+    border: none; border-radius: 999px; padding: .85rem 1.5rem; cursor: pointer;
+    text-decoration: none; transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 6px 30px rgba(245,206,75,.22);
+  }
+  .btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 40px rgba(245,206,75,.34); }
+
+  footer{
+    border-top: 1px solid var(--panel-brd); padding-block: var(--sp-4);
+    color: var(--ink-mute); font-size: var(--t--1);
+  }
+  footer .wrap{ display: flex; justify-content: space-between; gap: var(--sp-2); flex-wrap: wrap; }
+
+  :focus-visible{ outline: 2px solid var(--arrow); outline-offset: 3px; border-radius: 4px; }
+
+  @media (max-width: 820px){
+    .console .inner{ grid-template-columns: 1fr; }
+    .transport{ min-width: 0; }
+    .figures{ grid-template-columns: 1fr; gap: var(--sp-4); }
+    .levers{ grid-template-columns: 1fr; }
+    .hero-copy{ top: 16%; }
+    .hero-copy .inner{ justify-content: flex-start; }
+    .hero-text{ max-width: none; }
+    .kpis{ justify-content: flex-start; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    .btn:hover{ transform: none; }
+  }
+</style>
+
+<main>
+  <!-- ================= HERO / MAPA ================= -->
+  <section class="stage" aria-label="Mapa de flujos de peregrinos">
+    <canvas id="map"></canvas>
+    <div id="tip" aria-hidden="true"></div>
+
+    <div class="topbar">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <g fill="none" stroke="#F5CE4B" stroke-width="1.6" stroke-linecap="round">
+            <path d="M16 27 C 7 24, 4 15, 16 5 C 28 15, 25 24, 16 27 Z" fill="rgba(245,206,75,.10)"/>
+            <path d="M16 26 L16 7 M16 25 L9 9 M16 25 L23 9 M16 25 L5.5 13 M16 25 L26.5 13"/>
+          </g>
+        </svg>
+        <span class="name">Stellae<b>.ai</b></span>
+      </div>
+      <span class="tag">Consultoría de flujos · Camino de Santiago</span>
+    </div>
+
+    <div class="hero-copy">
+      <div class="inner">
+        <div class="hero-text">
+          <p class="eyebrow">Cada año, miles de peregrinos pasan por tu puerta</p>
+          <h1>Sabemos quién pasa, y cuándo. Tú decides cómo aprovecharlo.</h1>
+          <p class="lede">Diez años de flujos del Camino, convertidos en palancas concretas
+            de crecimiento para tu negocio.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="console">
+      <div class="inner">
+        <div class="transport">
+          <div class="row">
+            <button class="play" id="play" aria-label="Reproducir animación">
+              <svg id="play-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5 13 8 4 13.5Z"/></svg>
+            </button>
+            <span class="daylabel" id="daylabel">—</span>
+            <input type="range" id="seek" min="0" max="100" step="0.1" value="0" aria-label="Línea de tiempo">
+          </div>
+          <div class="row filters" id="filters" role="group" aria-label="Filtrar por perfil de peregrino">
+            <button class="chip" data-p="-1" data-on="1">Todos los perfiles</button>
+            <button class="chip pa" data-p="0" data-on="0"><span class="dot"></span>Perfil A</button>
+            <button class="chip pb" data-p="1" data-on="0"><span class="dot"></span>Perfil B</button>
+            <button class="chip pc" data-p="2" data-on="0"><span class="dot"></span>Perfil C</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <div class="k-label">Peregrinos en ruta</div>
+            <div class="k-val" id="kpi-total">—</div>
+          </div>
+          <div class="kpi">
+            <div class="k-label">Zona más transitada</div>
+            <div class="k-val" id="kpi-top" style="font-size:1.05rem;line-height:1.35">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scrollcue">Baja para ver la palanca ↓</div>
+  </section>
+
+  <!-- ================= LA PALANCA ================= -->
+  <section class="section section--lever">
+    <div class="wrap">
+      <div class="lever-head">
+        <p class="eyebrow">Un ejemplo real · <span class="zone" id="zone-name">Sarria</span></p>
+        <h2>El <span id="pct-week">64</span>&nbsp;% de tus peregrinos pasa en una sola semana.</h2>
+      </div>
+
+      <div class="figures">
+        <div class="figure">
+          <div class="fig-num" id="fig-total">6.028</div>
+          <div class="fig-cap">peregrinos por tu zona en temporada alta</div>
+        </div>
+        <div class="figure">
+          <div class="fig-num">×<span id="fig-ratio">6,9</span></div>
+          <div class="fig-cap">el pico sobre tu día medio</div>
+        </div>
+        <div class="figure">
+          <div class="fig-num" id="fig-week">64<span class="unit">%</span></div>
+          <div class="fig-cap">del flujo, concentrado en 7 días</div>
+        </div>
+      </div>
+
+      <p class="lever-body">
+        Sarria es el kilómetro 100: donde arranca el grueso del Camino Francés. El flujo
+        no es un goteo constante, <strong>es una ola</strong>. Un negocio dimensionado y
+        tarificado para la media pierde por partida doble: se satura y deja clientes en la
+        puerta durante el pico, y se vacía el resto de la temporada. Eso no es mala suerte,
+        <strong>es una curva que se puede anticipar</strong>.
+      </p>
+
+      <div class="levers">
+        <div class="card">
+          <span class="kick">Pricing</span>
+          <h3>Cobra lo que vale el pico</h3>
+          <p>Sube tarifa la semana de máxima demanda y llena el hombro de la curva con
+            ofertas. La misma cama, más ingreso por temporada.</p>
+        </div>
+        <div class="card">
+          <span class="kick">Capacidad</span>
+          <h3>Dimensiona para la ola</h3>
+          <p>Personal y stock para el pico, no para la media. Ni colas que echan clientes,
+            ni sobrecoste el resto del mes.</p>
+        </div>
+        <div class="card">
+          <span class="kick">Marketing</span>
+          <h3>Habla al perfil que pasa</h3>
+          <p>Por tu zona pasa el peregrino del Camino Francés, no el del Portugués. No
+            inviertas un euro en captar a quien nunca cruza tu puerta.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CTA ================= -->
+  <section class="section section--cta">
+    <div class="wrap cta-inner">
+      <h2>Esto es una zona y un ejemplo. Tu negocio tiene los suyos.</h2>
+      <p>Cruzamos los flujos del Camino con los datos de tu negocio y te entregamos tus
+        palancas, cuantificadas.</p>
+      <a class="btn" href="mailto:hola@stellae.ai?subject=Quiero%20ver%20mis%20palancas">
+        Hablemos
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span>Stellae<b style="color:var(--arrow);font-weight:600">.ai</b> · Consultoría de flujos del Camino de Santiago</span>
+      <span>Hecho por <b style="color:var(--ink-soft);font-weight:600">Emilio</b>, experto en revenue</span>
+    </div>
+  </footer>
+</main>
+
+<script>
+"use strict";
+const DATA = __CAMINO_DATA__;
+
+/* ---------- Utilidades ---------- */
+const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const nf = new Intl.NumberFormat('es-ES');
+function fmtFecha(iso){ const [y,m,d] = iso.split('-').map(Number); return `${d} ${MESES[m-1]} ${y}`; }
+
+const cities = DATA.ciudades;
+const cityById = new Map(cities.map(c => [c.id, c]));
+const frames = DATA.frames;              // [{d, c:{id:[a,b,c]}}]
+const N = frames.length;
+const pal = DATA.palanca;
+
+const P_COLORS = ['#46C7B8','#E8A13A','#D96BA0'];
+const ARROW = '#F5CE4B';
+
+const norm = s => (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase();
+const santiago = cities.find(c => norm(c.nombre) === 'santiago de compostela');
+const sarriaId = pal.zonaId;
+
+/* ---------- Proyección (equirectangular con corrección de longitud) ---------- */
+let latMin=Infinity,latMax=-Infinity,lngMin=Infinity,lngMax=-Infinity;
+for(const c of cities){
+  latMin=Math.min(latMin,c.lat); latMax=Math.max(latMax,c.lat);
+  lngMin=Math.min(lngMin,c.lng); lngMax=Math.max(lngMax,c.lng);
+}
+const latMean = (latMin+latMax)/2;
+const kx = Math.cos(latMean*Math.PI/180);
+const dataW = (lngMax-lngMin)*kx, dataH = (latMax-latMin);
+
+const canvas = document.getElementById('map');
+const ctx = canvas.getContext('2d');
+let W=0, H=0, DPR=1, scale=1, offX=0, offY=0, padX=0, padY=0;
+
+function layout(){
+  const r = canvas.getBoundingClientRect();
+  W = r.width; H = r.height; DPR = Math.min(window.devicePixelRatio||1, 2);
+  canvas.width = Math.round(W*DPR); canvas.height = Math.round(H*DPR);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  // Encaje del mapa: anclado a la izquierda, reservando la derecha para el texto
+  const wide = W > 820;
+  const leftPad = wide ? W*0.04 : W*0.08;
+  const rightRes = wide ? W*0.40 : W*0.08;   // aire para el bloque de texto
+  padX = leftPad;
+  padY = wide ? H*0.12 : H*0.30;
+  const availW = W - leftPad - rightRes;
+  const availH = H - padY - H*0.22;
+  scale = Math.min(availW/dataW, availH/dataH);
+  offX = leftPad + (availW - dataW*scale)/2;
+  offY = padY + (availH - dataH*scale)/2;
+}
+function px(c){ return offX + (c.lng-lngMin)*kx*scale; }
+function py(c){ return offY + (latMax-c.lat)*scale; }
+
+/* ---------- Estado ---------- */
+let playhead = 0;          // índice de frame (float)
+let playing = false;
+let selectedP = -1;        // -1 = todos
+let hoverCity = null;
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Lectura de frecuencia interpolada ---------- */
+function freqAt(frameIdx, cityId, p){
+  const fr = frames[frameIdx]; if(!fr) return 0;
+  const arr = fr.c[cityId]; if(!arr) return 0;
+  return p < 0 ? (arr[0]+arr[1]+arr[2]) : arr[p];
+}
+function freqLerp(cityId, p){
+  const i = Math.floor(playhead);
+  const j = Math.min(i+1, N-1);
+  const t = playhead - i;
+  return freqAt(i,cityId,p)*(1-t) + freqAt(j,cityId,p)*t;
+}
+
+/* ---------- Dibujo ---------- */
+let dashPhase = 0;
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  // 1) Rutas tenues (las "vías") con luz que fluye hacia Santiago
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for(const ruta of DATA.rutas){
+    const ids = ruta.ids;
+    ctx.beginPath();
+    for(let k=0;k<ids.length;k++){
+      const c = cityById.get(ids[k]); if(!c) continue;
+      const x=px(c), y=py(c);
+      if(k===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle = 'rgba(120,140,180,.17)';
+    ctx.lineWidth = 1; ctx.setLineDash([]); ctx.stroke();
+    // pulso de luz recorriendo la vía
+    if(!reduce){
+      ctx.strokeStyle = 'rgba(245,206,75,.20)';
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash([2, 26]);
+      ctx.lineDashOffset = dashPhase;
+      ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // 2) Nodos-ciudad (glow aditivo), radio ∝ √frecuencia
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for(const c of cities){
+    if(c === santiago) continue;
+    let val, color;
+    if(selectedP < 0){
+      const a=freqLerp(c.id,0), b=freqLerp(c.id,1), d=freqLerp(c.id,2);
+      val = a+b+d;
+      if(val < 0.5) continue;
+      const mx = Math.max(a,b,d);
+      color = mx===a ? P_COLORS[0] : (mx===b ? P_COLORS[1] : P_COLORS[2]);
+    } else {
+      val = freqLerp(c.id, selectedP);
+      if(val < 0.5) continue;
+      color = P_COLORS[selectedP];
+    }
+    const x=px(c), y=py(c);
+    // radio ∝ √frecuencia, independiente del zoom (evita que todo sature)
+    const r = Math.min(1.7 + Math.sqrt(val)*0.48, 17);
+    const gr = r*2.35;
+    const g = ctx.createRadialGradient(x,y,0, x,y,gr);
+    g.addColorStop(0,   hexA(color,.62));
+    g.addColorStop(.32, hexA(color,.24));
+    g.addColorStop(1,   hexA(color,0));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x,y,gr,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = hexA(color,.92);
+    ctx.beginPath(); ctx.arc(x,y,Math.max(.9,r*0.42),0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+
+  // 3) Sarria: anillo destacado + etiqueta
+  if(sarriaId != null && cityById.get(sarriaId)){
+    const c = cityById.get(sarriaId); const x=px(c), y=py(c);
+    const pulse = reduce ? 0 : (Math.sin(dashPhase*0.06)*0.5+0.5);
+    ctx.save();
+    ctx.strokeStyle = hexA('#EAECF2', .8);
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(x,y, 12 + pulse*4, 0, Math.PI*2); ctx.stroke();
+    ctx.fillStyle = '#EAECF2'; ctx.font = '600 13px '+cssVar('--font-body');
+    ctx.textBaseline='middle';
+    ctx.fillText('Sarria', x+18, y);
+    ctx.restore();
+  }
+
+  // 4) Santiago: estrella-flecha
+  if(santiago){
+    const x=px(santiago), y=py(santiago);
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    const g = ctx.createRadialGradient(x,y,0,x,y,30);
+    g.addColorStop(0, hexA(ARROW,.58)); g.addColorStop(.32, hexA(ARROW,.20)); g.addColorStop(1, hexA(ARROW,0));
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,30,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    drawStar(x,y,8,3.8,4, ARROW);
+    ctx.fillStyle = ARROW; ctx.font = '600 13px '+cssVar('--font-display');
+    ctx.textBaseline='middle';
+    ctx.fillText('Santiago', x+15, y+1);
+  }
+}
+
+function drawStar(cx,cy,rOuter,rInner,points,color){
+  ctx.save(); ctx.beginPath();
+  for(let i=0;i<points*2;i++){
+    const r = i%2===0 ? rOuter : rInner;
+    const a = (i/(points*2))*Math.PI*2 - Math.PI/2;
+    const x = cx + Math.cos(a)*r, y = cy + Math.sin(a)*r;
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill(); ctx.restore();
+}
+
+function hexA(hex,a){
+  const h = hex.replace('#',''); const n=parseInt(h,16);
+  const r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  return `rgba(${r},${g},${b},${a})`;
+}
+function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name) || 'sans-serif'; }
+
+/* ---------- KPIs y etiqueta de día ---------- */
+const elDay = document.getElementById('daylabel');
+const elTotal = document.getElementById('kpi-total');
+const elTop = document.getElementById('kpi-top');
+const elSeek = document.getElementById('seek');
+
+function updateReadout(){
+  const idx = Math.round(playhead);
+  const fr = frames[idx]; if(!fr) return;
+  elDay.textContent = fmtFecha(fr.d);
+  let total=0, topId=null, topVal=-1;
+  for(const id in fr.c){
+    const arr = fr.c[id];
+    const v = selectedP<0 ? (arr[0]+arr[1]+arr[2]) : arr[selectedP];
+    total += v;
+    if(v>topVal){ topVal=v; topId=+id; }
+  }
+  elTotal.innerHTML = nf.format(Math.round(total)) + ' <small>hoy</small>';
+  const tc = topId!=null ? cityById.get(topId) : null;
+  elTop.textContent = tc ? tc.nombre : '—';
+  const pct = N>1 ? (playhead/(N-1))*100 : 0;
+  elSeek.value = pct;
+  document.documentElement.style.setProperty('--seek', pct+'%');
+}
+
+/* ---------- Bucle de animación ---------- */
+let last = performance.now();
+const SPEED = 1.35; // días por segundo
+function tick(now){
+  const dt = Math.min((now-last)/1000, 0.05); last = now;
+  if(playing){
+    playhead += dt*SPEED;
+    if(playhead >= N-1){ playhead = N-1; setPlaying(false); }
+  }
+  dashPhase -= dt*60;
+  draw();
+  updateReadout();
+  requestAnimationFrame(tick);
+}
+
+/* ---------- Controles ---------- */
+const playBtn = document.getElementById('play');
+const playIcon = document.getElementById('play-icon');
+function setPlaying(v){
+  playing = v;
+  playIcon.innerHTML = v
+    ? '<rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/>'
+    : '<path d="M4 2.5 13 8 4 13.5Z"/>';
+  playBtn.setAttribute('aria-label', v ? 'Pausar animación' : 'Reproducir animación');
+}
+playBtn.addEventListener('click', ()=>{
+  if(!playing && playhead >= N-1) playhead = 0;
+  setPlaying(!playing);
+});
+elSeek.addEventListener('input', ()=>{
+  setPlaying(false);
+  playhead = (parseFloat(elSeek.value)/100)*(N-1);
+});
+
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    selectedP = parseInt(chip.dataset.p,10);
+    document.querySelectorAll('.chip').forEach(c=>c.dataset.on = (c===chip)?'1':'0');
+  });
+});
+
+/* ---------- Hover / tooltip ---------- */
+const tip = document.getElementById('tip');
+canvas.addEventListener('pointermove', e=>{
+  const r = canvas.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  let best=null, bestD=18*18;
+  for(const c of cities){
+    const dx = px(c)-mx, dy = py(c)-my; const d = dx*dx+dy*dy;
+    if(d < bestD){ bestD=d; best=c; }
+  }
+  hoverCity = best;
+  if(best){
+    const v = freqLerp(best.id, selectedP);
+    tip.style.left = px(best)+'px'; tip.style.top = py(best)+'px';
+    tip.style.opacity = '1';
+    tip.innerHTML = `<span class="t-name">${best.nombre}</span> · <span class="t-num">${nf.format(Math.round(v))}</span>`;
+  } else { tip.style.opacity = '0'; }
+});
+canvas.addEventListener('pointerleave', ()=>{ tip.style.opacity='0'; hoverCity=null; });
+
+/* ---------- Rellenar cifras de la palanca desde el dato ---------- */
+document.getElementById('zone-name').textContent = pal.zona;
+document.getElementById('pct-week').textContent = pal.pctSemanaPico;
+document.getElementById('fig-total').textContent = nf.format(pal.total);
+document.getElementById('fig-ratio').textContent = pal.ratioPico.toLocaleString('es-ES',{minimumFractionDigits:1});
+document.getElementById('fig-week').innerHTML = pal.pctSemanaPico + '<span class="unit">%</span>';
+
+/* ---------- Arranque ---------- */
+function start(){
+  layout();
+  if(reduce){
+    // sin autoplay: mostrar el día pico como fotograma representativo
+    const peakIdx = frames.findIndex(f => f.d === pal.picoFecha);
+    playhead = peakIdx >= 0 ? peakIdx : Math.floor(N*0.7);
+    setPlaying(false);
+  } else {
+    playhead = 0; setPlaying(true);
+  }
+  requestAnimationFrame(tick);
+}
+window.addEventListener('resize', layout);
+start();
+</script>
