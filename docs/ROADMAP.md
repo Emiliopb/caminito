@@ -112,6 +112,14 @@ del arranque de esta fase.
 **Objetivo:** poder regenerar los datos de la web sin depender de notebooks manuales.
 
 **Entregables:**
+- **Subir Python de 3.8 a 3.11+** y refrescar todos los pines. El 3.8 está **sin soporte
+  desde octubre de 2024** y bloquea cualquier actualización de seguridad: p. ej.
+  `scikit-learn` no puede pasar de 1.3.2 (la 1.5.0 ya no soporta 3.8). Ojo: arrastra
+  `prophet`/`cmdstanpy`, que suelen dar guerra al instalarse.
+  - *Contexto:* Dependabot alertó de CVE-2024-5206 (scikit-learn <1.5.0). Se **descartó**
+    como no aplicable: el fallo está en `TfidfVectorizer` y este proyecto no usa
+    `feature_extraction.text` en ningún sitio (solo KMeans/PCA sobre datos tabulares, y
+    solo en notebooks). Al subir Python, actualizar sklearn y cerrarlo de verdad.
 - Portar la cadena productiva (ver `docs/PIPELINE.md`) de notebooks a módulos en `src/`.
 - Cerrar cabos sueltos: productor real de `prevision_prophet_f.csv`; eliminar el renombrado
   manual `origenes_generados.csv` → `peres_futu.csv`; rutas robustas (sin rutas Windows).
